@@ -93,7 +93,7 @@ function Register() {
                     </form>
                     <div className="logincardfooter">
                         <font style={{ fontSize: 'large' }}>
-                            <p>Already have an account ? <a href='http://localhost:3000/authentication'>Login here</a></p>
+                            <p>Already have an account ? <a href='./authentication'>Login here</a></p>
                         </font>
                     </div>
                 </div>
