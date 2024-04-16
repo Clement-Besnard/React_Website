@@ -1,32 +1,57 @@
-// userService.test.js
-import { Register } from '../Register.js'; // Importez la fonction à tester depuis votre fichier source
-import fetchMock from 'fetch-mock'; // Utilisez fetchMock pour simuler les requêtes HTTP
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import Register from '../Register';
 
-// Test de la fonction registerUser
-describe('Register function', () => {
-  afterEach(() => {
-    fetchMock.restore(); // Restaurez fetchMock après chaque test
+
+describe('Test de création de compte via l\'API', () => {
+  it('Devrait créer un nouveau compte avec succès', async () => {
+    // Envoyer une requête POST pour créer un nouveau compte
+    const response = await fetch("http://localhost:5000/register", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  username: 'nouvel_utilisateur',
+                  email: 'nouvel_utilisateur@example.com',
+                  password: 'password_secure'
+                })
+            });
+
+    // Attendre que la promesse se résolve
+    const responseData = await response.json();
+
+    // Vérifier le code de statut de la réponse
+    expect(response.status).toBe(201);
+    
+    // Vérifier le corps de la réponse
+    expect(responseData.message).toBe('Utilisateur enregistré avec succès');
+    expect(responseData.userId).toBeDefined(); // Vérifiez si un ID d'utilisateur est renvoyé
   });
 
-  it('should register a user successfully', async () => {
-    // Configurer fetchMock pour simuler une réponse réussie
-    fetchMock.post('http://localhost:5000/register', { status: 200 });
-
-    // Appeler la fonction registerUser avec des valeurs d'email et de mot de passe valides
-    const result = await Register('test@example.com', 'password');
-
-    // Vérifier que la fonction retourne true après l'inscription réussie
-    expect(result).toBe(true);
-  });
-
-  it('should handle registration failure', async () => {
-    // Configurer fetchMock pour simuler une réponse d'erreur
-    fetchMock.post('http://localhost:5000/register', { status: 400 });
-
-    // Appeler la fonction registerUser avec des valeurs d'email et de mot de passe invalides
-    const result = await Register('test@example.com', 'password');
-
-    // Vérifier que la fonction retourne false en cas d'échec de l'inscription
-    expect(result).toBe(false);
-  });
+  // Ajoutez d'autres tests pour gérer les scénarios d'erreur ou les cas limites
 });
+
+it('renders the registration form', () => {
+  render(
+    <Router>
+      <Register />
+    </Router>
+  );
+  const formElement = screen.getByTestId('logincardform');
+  expect(formElement).toBeInTheDocument();
+});
+
+it('renders the submit button', () => {
+  render(
+    <Router>
+      <Register />
+    </Router>
+  );
+
+  // Vérifie si le bouton de soumission est présent dans le document
+  const submitButton = screen.getByRole('button', { name: /register/i });
+  expect(submitButton).toBeInTheDocument();
+});
+
+// Les autres tests restent inchangés

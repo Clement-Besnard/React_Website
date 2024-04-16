@@ -72,7 +72,7 @@ function Register() {
                         <h1>Registration</h1>
                         <div>Create an account to use the platform.</div>
                     </div>
-                    <form onSubmit={onSubmit} method='post' className="logincardform" noValidate>
+                    <form onSubmit={onSubmit} method='post' className="logincardform" data-testid="logincardform" noValidate>
                         <div className="formitem">
                             <span className="material-icons">chevron_right</span>
                             <input type="text" id="name" name="name" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />

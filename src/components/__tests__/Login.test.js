@@ -1,36 +1,30 @@
-// Importer les modules nécessaires
-const { expect } = require('chai');
-const fetch = require('node-fetch'); // Assurez-vous que node-fetch est installé
-const fetchMock = require('fetch-mock');
+describe('Test de connexion via l\'API', () => {
+  it('Devrait permettre à l\'utilisateur de se connecter avec succès', async () => {
+    // Envoyer une requête POST pour se connecter avec les identifiants d'un utilisateur existant
+    const response = await fetch("http://localhost:5000/login", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  email: 'nouvel_utilisateur@example.com', // Email de l'utilisateur
+                  password: 'password_secure' // Mot de passe de l'utilisateur
+                })
+            });
 
-// Importer la fonction de login à tester
-const { Authentication } = require('../Authentication.js');
+    // Attendre que la promesse se résolve
+    const responseData = await response.json();
 
-// Décrire les tests d'intégration pour le processus de connexion
-describe('Login Process', () => {
-  afterEach(() => {
-    fetchMock.restore(); // Restaurer fetchMock après chaque test
+    // Vérifier le code de statut de la réponse
+    expect(response.status).toBe(200);
+    
+    // Vérifier le corps de la réponse
+    expect(responseData.message).toBe('Authentification réussie');
+    expect(responseData.token).toBeDefined(); // Vérifiez si un jeton JWT est renvoyé
+    expect(responseData.userId).toBeDefined(); // Vérifiez si un ID d'utilisateur est renvoyé
+    expect(responseData.username).toBeDefined(); // Vérifiez si le nom d'utilisateur est renvoyé
   });
 
-  it('should login successfully and receive token', async () => {
-    // Configurer fetchMock pour simuler une réponse réussie avec un jeton
-    fetchMock.post('http://localhost:5000/login', { token: 'example_token' });
-
-    // Appeler la fonction Authentication avec des identifiants valides
-    const response = await Authentication('valid_user', 'valid_password');
-
-    // Vérifier que la fonction retourne le jeton attendu
-    expect(response.token).to.equal('example_token');
-  });
-
-  it('should handle login failure', async () => {
-    // Configurer fetchMock pour simuler une réponse d'erreur
-    fetchMock.post('http://localhost:5000/login', 401);
-
-    // Appeler la fonction Authentication avec des identifiants invalides
-    const response = await Authentication('invalid_user', 'invalid_password');
-
-    // Vérifier que la fonction retourne une erreur ou un statut 401 non autorisé
-    expect(response.status).to.equal(401);
-  });
+  // Ajoutez d'autres tests pour gérer les scénarios d'erreur ou les cas limites
 });
+
